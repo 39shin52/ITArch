@@ -8,5 +8,6 @@ interface IMyAidlInterface {
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
-    String getURL(String operator_name);
+    String getURL(String operatorName);
+    String getPosition(String operatorName);
 }
