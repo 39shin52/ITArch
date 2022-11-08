@@ -8,6 +8,5 @@ interface IMyAidlInterface {
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
-    String getModel(String aircraft_number);
-    String getOperation(String aircraft_number);
+    String getURL(String operator_name);
 }
