@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.os.HandlerCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
@@ -30,7 +32,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val mAidlConnection = AidlConnection()
     private var mServiceAidl: IMyAidlInterface? = null
     private var imageView: ImageView? = null
-    private var editText: EditText? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,21 +39,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<Button>(R.id.button).setOnClickListener(this)
         findViewById<EditText>(R.id.edit_text)
         imageView = findViewById<ImageView>(R.id.result)
+        findViewById<TextView>(R.id.textView)
     }
 
     override fun onClick(view: View) {
         val _mServiceAidl = mServiceAidl
-        if(edit_text.text != null) {
-            var ret = ""
-            try {
-                val str = edit_text.text.toString()
+        var ret = ""
+        try {
+            val str = edit_text.text.toString()
+            if(str != "operator name") {
+                textView.text = edit_text.text.toString()
                 ret = _mServiceAidl!!.getURL(str)
                 downloadImage(ret)
-            } catch (e: RemoteException){
-                e.printStackTrace()
+            } else {
+                try {
+                    textView.text = "ドクター"
+                    var ip: InputStream = resources.assets.open("image/doctor.png")
+                    var bm: Bitmap = BitmapFactory.decodeStream(ip)
+                    imageView!!.setImageBitmap(bm)
+                    Log.d(TAG, "doctor")
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
-        } else {
-            
+        } catch (e: RemoteException){
+            e.printStackTrace()
         }
     }
 
@@ -60,7 +71,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onStart()
         val intentAidl = Intent().setComponent(ComponentName("com.example.itarch", "com.example.itarch.MyService"))
         val bindAidl = bindService(Intent(this, MyService::class.java), AidlConnection(), Context.BIND_AUTO_CREATE)
-        Log.d(TAG, "Bind Aidl Connection "+ bindAidl)
+        Log.d(TAG, "Aidl Connection " + bindAidl)
     }
 
     private inner class AidlConnection : ServiceConnection {
@@ -75,22 +86,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    // urlから画像を取得して表示
     private fun downloadImage(urlSt: String) {
-        // Singleの別スレッドを立ち上げる
         Executors.newSingleThreadExecutor().execute {
             try {
                 val url = URL(urlSt)
                 val urlCon: HttpURLConnection = url.openConnection() as HttpURLConnection
-
                 // タイムアウト設定
                 urlCon.setReadTimeout(10000)
                 urlCon.setConnectTimeout(20000)
-
                 // リクエストメソッド
                 urlCon.setRequestMethod("GET")
-
-
-
                 // リダイレクトを自動で許可しない設定
                 urlCon.setInstanceFollowRedirects(false)
                 val `is`: InputStream = urlCon.getInputStream()
