@@ -12,7 +12,7 @@
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
         android:layout_height="69dp"
-        android:text="operator name" />
+        android:text="operator's name" />
 
 
     <Button
@@ -24,18 +24,28 @@
 
     <ImageView
         android:id="@+id/result"
-        android:layout_width="wrap_content"
-        android:layout_height="562dp"
-        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="476dp"
         android:layout_weight="1" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="411dp"
-        android:layout_height="38dp"
+        android:id="@+id/operatorName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Operator"
+        android:text="Name"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:textSize="25sp"
+        android:fontFamily="SANS_SERIF"/>
+
+    <TextView
+        android:id="@+id/operatorPosition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Position"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:fontFamily="SANS_SERIF"/>
 
 </LinearLayout>

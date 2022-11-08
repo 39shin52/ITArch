@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.os.RemoteException
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -39,7 +38,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<Button>(R.id.button).setOnClickListener(this)
         findViewById<EditText>(R.id.edit_text)
         imageView = findViewById<ImageView>(R.id.result)
-        findViewById<TextView>(R.id.textView)
+        findViewById<TextView>(R.id.operatorName)
+        findViewById<TextView>(R.id.operatorPosition)
     }
 
     override fun onClick(view: View) {
@@ -47,17 +47,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         var ret = ""
         try {
             val str = edit_text.text.toString()
-            if(str != "operator name") {
-                textView.text = edit_text.text.toString()
+            if(str != "operator's name" && str != "") {
+                operatorName.text = edit_text.text.toString()
                 ret = _mServiceAidl!!.getURL(str)
+                operatorPosition.text = _mServiceAidl!!.getPosition(str)
                 downloadImage(ret)
+                Log.d(TAG, "image from url!")
             } else {
                 try {
-                    textView.text = "ドクター"
+                    operatorName.text = "ドクター"
+                    operatorPosition.text = "指揮官"
                     var ip: InputStream = resources.assets.open("image/doctor.png")
                     var bm: Bitmap = BitmapFactory.decodeStream(ip)
                     imageView!!.setImageBitmap(bm)
-                    Log.d(TAG, "doctor")
+                    Log.d(TAG, "image from assets")
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -90,21 +93,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun downloadImage(urlSt: String) {
         Executors.newSingleThreadExecutor().execute {
             try {
-                val url = URL(urlSt)
-                val urlCon: HttpURLConnection = url.openConnection() as HttpURLConnection
-                // タイムアウト設定
-                urlCon.setReadTimeout(10000)
-                urlCon.setConnectTimeout(20000)
-                // リクエストメソッド
-                urlCon.setRequestMethod("GET")
-                // リダイレクトを自動で許可しない設定
-                urlCon.setInstanceFollowRedirects(false)
-                val `is`: InputStream = urlCon.getInputStream()
-                val bmp = BitmapFactory.decodeStream(`is`)
+                if(urlSt != "") {
+                    val url = URL(urlSt)
+                    val urlCon: HttpURLConnection = url.openConnection() as HttpURLConnection
+                    // タイムアウト設定
+                    urlCon.setReadTimeout(10000)
+                    urlCon.setConnectTimeout(20000)
+                    // リクエストメソッド
+                    urlCon.setRequestMethod("GET")
+                    // リダイレクトを自動で許可しない設定
+                    urlCon.setInstanceFollowRedirects(false)
+                    val `is`: InputStream = urlCon.getInputStream()
+                    val bmp = BitmapFactory.decodeStream(`is`)
 
-                // 別スレッド内での処理を管理し実行する
-                HandlerCompat.createAsync(mainLooper).post { // Mainスレッドに渡す
-                    imageView!!.setImageBitmap(bmp)
+                    // 別スレッド内での処理を管理し実行する
+                    HandlerCompat.createAsync(mainLooper).post { // Mainスレッドに渡す
+                        imageView!!.setImageBitmap(bmp)
+                    }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
