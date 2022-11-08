@@ -15,7 +15,7 @@
 
     <Button
         android:id="@+id/button"
-        android:text="ボタン"
+        android:text="画像取得"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -26,5 +26,14 @@
         android:layout_weight="1"
         android:gravity="center"
         android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="103dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="20dp"
+        android:text="オペレーター"
+        android:textSize="20sp" />
 
 </LinearLayout>
