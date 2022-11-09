@@ -27,14 +27,13 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     val TAG = "MainActivity"
 
-    var mBound = false
-    private val mAidlConnection = AidlConnection()
     private var mServiceAidl: IMyAidlInterface? = null
     private var imageView: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         findViewById<Button>(R.id.button).setOnClickListener(this)
         findViewById<EditText>(R.id.edit_text)
         imageView = findViewById<ImageView>(R.id.result)
@@ -43,15 +42,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(view: View) {
-        val _mServiceAidl = mServiceAidl
-        var ret = ""
+        var accessUrl = ""
         try {
             val str = edit_text.text.toString()
             if(str != "operator's name" && str != "") {
                 operatorName.text = edit_text.text.toString()
-                ret = _mServiceAidl!!.getURL(str)
-                operatorPosition.text = _mServiceAidl!!.getPosition(str)
-                downloadImage(ret)
+                accessUrl = mServiceAidl!!.getURL(str)
+                operatorPosition.text = mServiceAidl!!.getPosition(str)
+                downloadImage(accessUrl)
                 Log.d(TAG, "image from url!")
             } else {
                 try {
@@ -74,18 +72,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onStart()
         val intentAidl = Intent().setComponent(ComponentName("com.example.itarch", "com.example.itarch.MyService"))
         val bindAidl = bindService(Intent(this, MyService::class.java), AidlConnection(), Context.BIND_AUTO_CREATE)
-        Log.d(TAG, "Aidl Connection " + bindAidl)
+        Log.d(TAG, "Aidl Connection is " + bindAidl)
     }
 
     private inner class AidlConnection : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             mServiceAidl = IMyAidlInterface.Stub.asInterface(service)
-            mBound = true
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             mServiceAidl = null
-            mBound = false
         }
     }
 
